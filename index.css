@@ -52,7 +52,7 @@ body {
 }
 
 .bigbiglogosize {
-    margin-top: -30vh;
+    margin-top: -3vh;
     height: 120vh;
     margin-left: 30vw;
 }
@@ -148,38 +148,43 @@ body {
     margin-bottom: 10px;
 }
 
-.popup {
-    position: relative;
+.submitbox {
+    display: inline-block;
+    border-style: dashed;
+    border-color: white;
+    border-width: 3px;
+    border-radius: 20px;
+    margin-bottom: 30px;
+    width: 35%;
+    height: 50vh;
+    background-color: rgba(0, 0, 0, 0.4);
+    text-align: center;
+    vertical-align: middle;
+    line-height: 50vh;
+    color: grey;
+    font-size: 60px;
+    cursor: pointer;
 }
 
-.popup:hover .popup-content{
+.popup {
     position: relative;
-    display: block;
+    display: inline-block;
 }
 
 .popup-content {
     display: none;
     position: absolute;
-    right: -240px;
-    top: 100px;
+    top: 100%;
+    left: 0;
     background-color: rgb(22, 22, 22);
     border-radius: 13px;
     box-shadow: 5px 5px 10px black;
     z-index: 1;
-    width: 100px;
-    margin: auto;
+    width: 200px;
 }
 
-.popup-content a {
-    padding: 10px 10px;
-    text-decoration: none;
+.popup:hover .popup-content {
     display: block;
-    font-size: 13px;
-}
-
-.popup-content a:hover {
-    background-color: rgb(10, 10, 10);
-    border-radius: 13px;
 }
 
 .slider-container {
@@ -233,7 +238,7 @@ body {
     width: 100%;
     display: none;
     position: fixed;
-    z-index: 1;
+    z-index: 4;
     top: 0;
     left: 0;
     background-color: rgba(0, 0, 0, 0.8);
@@ -288,42 +293,64 @@ li a:visited {
     text-decoration: none;
 }
 
+.sliders-container {
+    float: left;
+    width: 50%;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    max-height: 80vh;
+}
 
+.slider-item {
+    margin-bottom: 15px;
+}
 
+.slider-item label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 18px;
+}
 
+.slider-item input[type="range"] {
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 15px;
+    background-image: linear-gradient(to right, #00b1f7, #00e082);
+    border-radius: 15px;
+    opacity: 0.7;
+}
 
+.slider-item input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 25px;
+    height: 25px;
+    background: white;
+    border-radius: 15px;
+}
 
+.images-container {
+    float: right;
+    width: 50%;
+    padding: 20px;
+    box-sizing: border-box;
+}
 
+.images-container img {
+    display: block;
+    max-width: 100%;
+    margin-bottom: 20px;
+}
 
+.buttons-container {
+    clear: both;
+    padding: 20px;
+    text-align: center;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+.buttons-container button {
+    margin: 0 10px;
+    padding: 10px 20px;
+    font-size: 20px;
+}

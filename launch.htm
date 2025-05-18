@@ -5,10 +5,11 @@
     <title>Phlight</title>
     <link rel="icon" type="image/png" href="logo.PNG">
     <link rel="stylesheet" href="index.css">
-    <script src="index.js"></script>
-    <script src="Phlight_back.py"></script>
     <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css"/>
-    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+    <script defer src="https://pyscript.net/latest/pyscript.js" onerror="console.error('Failed to load PyScript')"></script>
+    <py-config>
+        packages = ["pillow", "numpy"]
+    </py-config>
 </head>
 <body>
     <nav class="thenav">
@@ -19,38 +20,195 @@
             <li><a href="launch.htm">LAUNCH</a></li>
         </div>
     </nav>
+    
     <div class="floatright infoq"><img class="infoq" src="whar.png" onclick="openinst()"></div>
     <div id="inst" class="overlay">
-        <a href="javascript:void(0)" class="xoff" onclick="closeinst()">&times;</a>
+        <a href="javascript:void(0)" class="xoff" onclick="closeinst()">×</a>
         <div class="overlay-content">
-            1. Upload your base image (the photo you would like to edit) into the leftmost box. <br>2. Upload a reference image into the rightmost box or select one from our existing library. This will be the reference for the photography/editing style you would like your base image to be in. <br>3. Click LAUNCH to begin the analysis process. <br>4. Once analysis is complete, Phlight will provide you with its suggested edits.
+            1. Upload your base image (the photo you would like to edit) into the leftmost box.<br>
+            2. Upload a reference image into the rightmost box or select one from our existing library.<br>
+            3. Click LAUNCH to begin the analysis process.<br>
+            4. Once analysis is complete, Phlight will provide you with its suggested edits.
         </div>
     </div>
-    <h1 class="centered">Heading here</h1>
-    <div class="submitbox" id="submitleft">IMAGE 1</div>
-    <div class="popup">
-        <input type="file" id="selfUpload" hidden accept="image/*">
-        <input type="file" id="refUpload" hidden accept="image/*">
-        <a onclick="document.getElementById('selfUpload').click()">UPLOAD</a>
-        <a onclick="document.getElementById('refUpload').click()">CHOOSE FROM LIBRARY</a>
 
-        <script>
-        // Handle image previews and store files
+    <div class="upload-container">
+        <!-- Left Upload Box -->
+        <div class="upload-box" onclick="document.getElementById('selfUpload').click()">
+            <input type="file" id="selfUpload" hidden accept="image/*">
+            <div class="box-content" id="selfPreview">
+                <span class="upload-text">UPLOAD YOUR PHOTO</span>
+            </div>
+        </div>
+
+        <!-- Right Upload Box -->
+        <div class="upload-box right-box">
+            <div class="box-content" id="refPreview">
+                <span class="upload-text">REFERENCE PHOTO</span>
+                <div class="popup-menu">
+                    <div class="popup-option" onclick="document.getElementById('refUpload').click()">UPLOAD</div>
+                    <div class="popup-option" onclick="openLibrary()">CHOOSE FROM LIBRARY</div>
+                </div>
+            </div>
+            <input type="file" id="refUpload" hidden accept="image/*">
+        </div>
+    </div>
+
+    <button class="buttonshadow beginbutton flex-center" onclick="processImages()">LAUNCH</button>
+
+    <py-script src="Phlight_back.py"></py-script>
+
+    <script>
+        // Image Preview Handlers
         const selfUpload = document.getElementById('selfUpload');
         const refUpload = document.getElementById('refUpload');
-        let selfFile, refFile;
-
-        selfUpload.addEventListener('change', (e) => {
-            selfFile = e.target.files[0];
-            // Display preview logic here
+        
+        selfUpload.addEventListener('change', function(e) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                document.getElementById('selfPreview').style.backgroundImage = `url(${reader.result})`;
+                document.querySelector('.upload-box:not(.right-box) .upload-text').style.display = 'none';
+            }
+            reader.readAsDataURL(e.target.files[0]);
         });
 
-        refUpload.addEventListener('change', (e) => {
-            refFile = e.target.files[0];
-            // Display preview logic here
+        refUpload.addEventListener('change', function(e) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                document.getElementById('refPreview').style.backgroundImage = `url(${reader.result})`;
+                document.querySelector('.right-box .upload-text').style.display = 'none';
+            }
+            reader.readAsDataURL(e.target.files[0]);
         });
-        </script>
-    </div>
-    <button class="buttonshadow beginbutton flex-center" onclick="location.href='launch.htm'">LAUNCH</button>
+
+        function openLibrary() {
+            alert('Library feature coming soon!');
+        }
+
+        function processImages() {
+            const selfFile = selfUpload.files[0];
+            const refFile = refUpload.files[0];
+            
+            if (!selfFile || !refFile) {
+                alert('Please upload both images!');
+                return;
+            }
+
+            const reader1 = new FileReader();
+            const reader2 = new FileReader();
+            
+            reader1.onload = function() {
+                const selfData = reader1.result.split(',')[1];
+                reader2.onload = function() {
+                    const refData = reader2.result.split(',')[1];
+                    // Check if pyscript is available
+                    if (typeof pyscript === 'undefined') {
+                        console.error('PyScript is not loaded');
+                        alert('PyScript is not loaded. Please try refreshing the page.');
+                        return;
+                    }
+                    // Use pyscript.interpreter.runPythonAsync instead of pyodide.runPythonAsync
+                    pyscript.interpreter.runPythonAsync(`
+                        from Phlight_back import process_images
+                        result = process_images("${selfData}", "${refData}")
+                        result
+                    `).then(result => {
+                        console.log('Python result:', result);
+                        localStorage.setItem("phlightResult", JSON.stringify(result));
+                        window.location.href = 'results.htm';
+                    }).catch(error => {
+                        console.error('Error in Python execution:', error);
+                        alert('Error processing images. Please check the console for details.');
+                    });
+                };
+                reader2.readAsDataURL(refFile);
+            };
+            reader1.readAsDataURL(selfFile);
+        }
+
+        function openinst() {
+            document.getElementById("inst").style.display = "block";
+        }
+
+        function closeinst() {
+            document.getElementById("inst").style.display = "none";
+        }
+    </script>
+
+    <style>
+        .upload-container {
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            margin: 50px auto;
+            max-width: 1200px;
+        }
+
+        .upload-box {
+            width: 500px;
+            height: 500px;
+            border: 3px dashed #fff;
+            border-radius: 20px;
+            position: relative;
+            background: rgba(0,0,0,0.3);
+            cursor: pointer;
+        }
+
+        .box-content {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-size: cover;
+            background-position: center;
+            flex-direction: column;
+        }
+
+        .upload-text {
+            font-size: 24px;
+            color: #fff;
+            text-align: center;
+            pointer-events: none;
+            margin-bottom: 20px;
+        }
+
+        .popup-menu {
+            display: none;
+            flex-direction: column;
+            background: rgba(0,0,0,0.8);
+            border-radius: 10px;
+            overflow: hidden;
+            width: 80%;
+            max-width: 200px;
+        }
+
+        .right-box:hover .popup-menu {
+            display: flex;
+        }
+
+        .popup-option {
+            padding: 15px 20px;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+            text-align: center;
+        }
+
+        .popup-option:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .right-box .upload-text {
+            position: relative;
+            z-index: 1;
+        }
+
+        .right-box:hover .upload-text {
+            display: none;
+        }
+    </style>
+    <py-script src = "Phlight_back.py"></py-script>
 </body>
 </html>
