@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Phlight</title>
+    <link rel="icon" type="image/png" href="logo.PNG">
+    <link rel="stylesheet" href="index.css">
+    <script src="index.js"></script>
+    <script src="Phlight_back.py"></script>
+    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css"/>
+    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+</head>
+<body>
+    <nav class="thenav">
+        <a href="main.htm" class="floatleft"><img src="logo.png" class="logosize"></a>
+        <div class="navbar">
+            <li><a href="about.htm">ABOUT</a></li>
+            <li><a href="faq.htm">FAQ</a></li>
+            <li><a href="launch.htm">LAUNCH</a></li>
+        </div>
+    </nav>
+    <div class="floatright infoq"><img class="infoq" src="whar.png" onclick="openinst()"></div>
+    <div id="inst" class="overlay">
+        <a href="javascript:void(0)" class="xoff" onclick="closeinst()">&times;</a>
+        <div class="overlay-content">
+            1. Upload your base image (the photo you would like to edit) into the leftmost box. <br>2. Upload a reference image into the rightmost box or select one from our existing library. This will be the reference for the photography/editing style you would like your base image to be in. <br>3. Click LAUNCH to begin the analysis process. <br>4. Once analysis is complete, Phlight will provide you with its suggested edits.
+        </div>
+    </div>
+    <h1 class="centered">Heading here</h1>
+    <div class="submitbox" id="submitleft">IMAGE 1</div>
+    <div class="popup">
+        <input type="file" id="selfUpload" hidden accept="image/*">
+        <input type="file" id="refUpload" hidden accept="image/*">
+        <a onclick="document.getElementById('selfUpload').click()">UPLOAD</a>
+        <a onclick="document.getElementById('refUpload').click()">CHOOSE FROM LIBRARY</a>
+
+        <script>
+        // Handle image previews and store files
+        const selfUpload = document.getElementById('selfUpload');
+        const refUpload = document.getElementById('refUpload');
+        let selfFile, refFile;
+
+        selfUpload.addEventListener('change', (e) => {
+            selfFile = e.target.files[0];
+            // Display preview logic here
+        });
+
+        refUpload.addEventListener('change', (e) => {
+            refFile = e.target.files[0];
+            // Display preview logic here
+        });
+        </script>
+    </div>
+    <button class="buttonshadow beginbutton flex-center" onclick="location.href='launch.htm'">LAUNCH</button>
+</body>
+</html>
